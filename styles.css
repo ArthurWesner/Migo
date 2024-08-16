@@ -8,7 +8,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: linear-gradient(to bottom, #152e94, #3760e4); /* Cor de fundo degrade */
+    background: linear-gradient(to bottom, #0c23b3, #4167e5); /* Cor de fundo degrade */
 }
 
 /* Tela de Verificação de Idade */
