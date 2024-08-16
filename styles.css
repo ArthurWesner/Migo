@@ -55,9 +55,9 @@ body {
     height: 80%;
     max-height: 800px;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Espaça os elementos horizontalmente */
     align-items: center;
-    gap: 20px;
+    gap: 20px; /* Espaço entre os elementos */
     z-index: 1; /* Garantir que a página principal esteja atrás da tela de verificação */
     transition: opacity 0.5s ease-in-out;
     opacity: 0;
@@ -81,13 +81,14 @@ body {
     justify-content: center;
     align-items: center;
     flex: 1;
-    max-width: 300px; /* Largura máxima */
+    max-width: 30%; /* Largura máxima */
     max-height: 300px; /* Altura máxima */
+    box-sizing: border-box;
 }
 
 /* Estilo específico para a área de login */
 #center-login {
-    max-width: 400px; /* Largura máxima para o login */
+    max-width: 40%; /* Largura máxima para o login */
     position: relative; /* Adiciona para posicionar o logo */
 }
 
@@ -123,6 +124,8 @@ body {
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #login-form button {
