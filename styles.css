@@ -1,180 +1,159 @@
-/* Estilos base */
+/* Estilos gerais */
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #99caf5, #82bdf5);
-    color: #fff;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
     display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100vh;
-    flex-direction: row;
-    overflow: hidden;
+    background: linear-gradient(to bottom, #152e94, #3760e4); /* Cor de fundo degrade */
 }
 
-#left-panel {
-    width: 25%;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-sizing: border-box;
-}
-
-#chat-panel {
-    width: 50%;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box;
-}
-
-#ad-panel {
-    width: 25%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    padding: 10px;
-    box-sizing: border-box;
-    text-align: center;
-    font-size: 14px;
-}
-
-#remote-video, #local-video {
-    width: 100%;
-    height: 40%;
-    background: #333;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    position: relative;
-    overflow: hidden;
-}
-
-.video-placeholder {
+/* Tela de Verificação de Idade */
+#age-verification {
+    position: absolute;
     width: 100%;
     height: 100%;
     display: flex;
+    justify-content: center;
     align-items: center;
-    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro semitransparente */
+    z-index: 2; /* Garantir que a tela de verificação esteja sobre o canvas */
 }
 
-.control-buttons {
-    display: flex;
-    justify-content: center;
-    margin-top: 5px;
+#age-verification div {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
 }
 
-.control-button {
-    width: 50px;  
-    height: 50px; 
-    margin: 0 10px;
-    cursor: pointer;
-}
-
-#chat-box {
-    flex-grow: 1;
-    background: rgba(255, 255, 255, 0.2);
-    margin-bottom: 10px;
+/* Botões de verificação de idade */
+#age-verification button {
     padding: 10px;
-    overflow-y: auto;
-    box-sizing: border-box;
-    color: #000; /* Cor do texto no chat em preto */
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    margin: 5px;
+    font-size: 16px;
+}
+
+#age-verification button:hover {
+    background-color: #0056b3;
+}
+
+/* Página Principal */
+#main-page {
+    display: none; /* Esconde a página principal inicialmente */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    height: 80%;
+    gap: 20px; /* Espaçamento entre os retângulos */
+    z-index: 1; /* Garantir que a página principal esteja atrás da tela de verificação */
+    transition: opacity 0.5s ease-in-out; /* Transição suave ao mostrar/esconder */
+    opacity: 0; /* Começa invisível */
+}
+
+/* Mostrar a página principal com fade-in */
+#main-page.show {
+    opacity: 1;
+}
+
+/* Estilos para os retângulos de anúncio e login */
+.ad-space, #center-login {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Espaçamento entre mensagens */
+    justify-content: center;
+    align-items: center;
+    width: 30%; /* Tamanho fixo para todos os retângulos */
+    height: 300px; /* Altura fixa para todos os retângulos */
 }
 
-#message-container {
+/* Estilo específico para a área de login */
+#center-login {
+    width: 40%; /* Ajuste para permitir mais espaço para o formulário */
+    position: relative; /* Adiciona para posicionar o logo */
+}
+
+/* Contêiner do Logo */
+#logo-container {
+    position: absolute;
+    top: 10px; /* Distância do topo */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+}
+
+#logo-container img {
+    max-width: 70%; /* Ajuste o tamanho máximo conforme necessário */
+    height: auto;
+}
+
+/* Estilos para o formulário de login */
+#login-form {
+    width: 80%;
     display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    margin-top: 10px;
+    flex-direction: column;
+    margin-top: 150px; /* Espaço abaixo do logo */
 }
 
-#message-input {
-    flex-grow: 1;
+#login-form label {
+    margin: 10px 0 5px;
+}
+
+#login-form input {
     padding: 10px;
-    border-radius: 8px;
-    border: none;
-    box-sizing: border-box;
-    resize: none;
-    max-height: 100px; /* Limita a altura do campo de digitação */
-    min-height: 50px; /* Altura mínima do campo de digitação */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
 }
 
-#send-button, #skip-button, #report-button {
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    padding: 17px 20px;
-    border-radius: 8px;
+#login-form button {
+    padding: 10px;
     border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
     cursor: pointer;
+    font-size: 16px;
 }
 
-#send-button {
-    background-color: #28a745;
-    color: rgb(0, 0, 0);
+#login-form button:hover {
+    background-color: #0056b3;
 }
 
-#skip-button {
-    background-color: #ffc107;
-    color: rgb(0, 0, 0);
+/* Estilos do Canvas */
+#bubbles {
+    position: fixed; /* Garante que o canvas ocupe a tela inteira */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* Coloca o canvas atrás do conteúdo */
 }
 
-#report-button {
-    background-color: #dc3545;
-    color: rgb(0, 0, 0);
-}
-
-.message-bubble {
-    max-width: 70%;
-    padding: 10px;
-    border-radius: 15px;
-    color: #000;
-    word-wrap: break-word;
-    background-color: #f1f1f1; /* Cor do balão de mensagem do usuário */
-    display: inline-block;
-    word-break: break-word;
-    line-height: 1.4;
-    white-space: pre-wrap; /* Preserva espaços e quebras de linha */
-    align-self: flex-start; /* Alinha as mensagens do usuário à esquerda */
-}
-
-.other-message-bubble {
-    max-width: 70%;
-    padding: 10px;
-    border-radius: 15px;
-    color: #000;
-    word-wrap: break-word;
-    background-color: #d4edda; /* Cor do balão de mensagem do outro usuário */
-    display: inline-block;
-    word-break: break-word;
-    line-height: 1.4;
-    white-space: pre-wrap; /* Preserva espaços e quebras de linha */
-    align-self: flex-end; /* Alinha as mensagens do outro usuário à direita */
-}
-
-/* Estilos responsivos */
-@media (max-width: 768px) {
-    body {
-        flex-direction: column;
-    }
-    #left-panel, #chat-panel, #ad-panel {
-        width: 100%;
-        height: auto;
-    }
-    #remote-video, #local-video {
-        height: 150px;
-    }
-    #ad-panel {
-        height: 150px;
-        margin-top: 10px;
-    }
-    .control-buttons {
-        margin-top: 5px;
-    }
+/* Estilo para o espaço de anúncios */
+.ad-space {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30%; /* Ajuste a largura conforme necessário */
+    height: 300px; /* Ajuste a altura conforme necessário */
+    overflow: hidden; /* Evita que o conteúdo saia do retângulo */
 }
