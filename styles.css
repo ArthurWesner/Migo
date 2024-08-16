@@ -3,7 +3,6 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -49,8 +48,7 @@ body {
 
 /* Página Principal */
 #main-page {
-    display: none; /* Esconde a página principal inicialmente */
-    display: flex;
+    display: flex; /* Garante que os elementos filhos sejam exibidos em modo flex */
     justify-content: space-between;
     align-items: center;
     width: 80%;
@@ -59,11 +57,13 @@ body {
     z-index: 1; /* Garantir que a página principal esteja atrás da tela de verificação */
     transition: opacity 0.5s ease-in-out; /* Transição suave ao mostrar/esconder */
     opacity: 0; /* Começa invisível */
+    visibility: hidden; /* Esconde a página para evitar interações */
 }
 
 /* Mostrar a página principal com fade-in */
 #main-page.show {
     opacity: 1;
+    visibility: visible; /* Mostra a página quando a classe 'show' é adicionada */
 }
 
 /* Estilos para os retângulos de anúncio e login */
@@ -76,13 +76,17 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 30%; /* Tamanho fixo para todos os retângulos */
-    height: 300px; /* Altura fixa para todos os retângulos */
+    width: 100%; /* Usar largura relativa ao contêiner pai */
+    height: 100%; /* Garantir altura relativa ao contêiner pai */
+    max-width: 300px; /* Limitar a largura máxima para evitar distorções */
+    max-height: 300px; /* Limitar a altura máxima */
+    overflow: hidden; /* Evita que o conteúdo saia do retângulo */
 }
 
 /* Estilo específico para a área de login */
 #center-login {
-    width: 40%; /* Ajuste para permitir mais espaço para o formulário */
+    width: 100%; /* Usar largura relativa ao contêiner pai */
+    max-width: 400px; /* Ajuste para permitir mais espaço para o formulário */
     position: relative; /* Adiciona para posicionar o logo */
 }
 
@@ -141,19 +145,21 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0; /* Coloca o canvas atrás do conteúdo */
+    z-index: -1; /* Coloca o canvas atrás do conteúdo */
 }
 
-/* Estilo para o espaço de anúncios */
-.ad-space {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 30%; /* Ajuste a largura conforme necessário */
-    height: 300px; /* Ajuste a altura conforme necessário */
-    overflow: hidden; /* Evita que o conteúdo saia do retângulo */
+/* Responsividade Geral */
+@media screen and (max-width: 768px) {
+    #main-page {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+    }
+
+    .ad-space, #center-login {
+        width: 80%;
+        max-width: none;
+        height: auto;
+        max-height: none;
+    }
 }
