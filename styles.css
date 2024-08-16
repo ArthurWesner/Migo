@@ -1,169 +1,180 @@
-/* Estilos gerais */
+/* Estilos base */
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #99caf5, #82bdf5);
+    color: #fff;
     display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
-    background: linear-gradient(to bottom, #1f1068, #2c479e); /* Cor de fundo degrade */
-    overflow: hidden; /* Evita rolagem indesejada */
+    flex-direction: row;
+    overflow: hidden;
 }
 
-/* Tela de Verificação de Idade */
-#age-verification {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro semitransparente */
-    z-index: 2; /* Garantir que a tela de verificação esteja sobre o canvas */
-}
-
-#age-verification div {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    text-align: center;
-}
-
-/* Botões de verificação de idade */
-#age-verification button {
+#left-panel {
+    width: 25%;
     padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-    margin: 5px;
-    font-size: 16px;
-}
-
-#age-verification button:hover {
-    background-color: #0056b3;
-}
-
-/* Página Principal */
-#main-page {
-    display: none; /* Esconde a página principal inicialmente */
-    width: 80%;
-    max-width: 1200px;
-    height: 80%;
-    max-height: 800px;
-    display: flex;
-    justify-content: space-between; /* Espaça os elementos horizontalmente */
-    align-items: center;
-    gap: 20px; /* Espaço entre os elementos */
-    z-index: 1; /* Garantir que a página principal esteja atrás da tela de verificação */
-    transition: opacity 0.5s ease-in-out;
-    opacity: 0;
-    visibility: hidden;
-}
-
-/* Mostrar a página principal com fade-in */
-#main-page.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Estilos para os retângulos de anúncio e login */
-.ad-space, #center-login {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    flex: 1;
-    max-width: 30%; /* Largura máxima */
-    max-height: 300px; /* Altura máxima */
     box-sizing: border-box;
 }
 
-/* Estilo específico para a área de login */
-#center-login {
-    max-width: 40%; /* Largura máxima para o login */
-    position: relative; /* Adiciona para posicionar o logo */
-}
-
-/* Contêiner do Logo */
-#logo-container {
-    position: absolute;
-    top: 10px; /* Distância do topo */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    text-align: center;
-}
-
-#logo-container img {
-    max-width: 70%; /* Ajuste o tamanho máximo conforme necessário */
-    height: auto;
-}
-
-/* Estilos para o formulário de login */
-#login-form {
-    width: 80%;
+#chat-panel {
+    width: 50%;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    margin-top: 150px; /* Espaço abaixo do logo */
+    justify-content: space-between;
+    box-sizing: border-box;
 }
 
-#login-form label {
-    margin: 10px 0 5px;
-}
-
-#login-form input {
+#ad-panel {
+    width: 25%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 14px;
+}
+
+#remote-video, #local-video {
+    width: 100%;
+    height: 40%;
+    background: #333;
     margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    position: relative;
+    overflow: hidden;
 }
 
-#login-form button {
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#login-form button:hover {
-    background-color: #0056b3;
-}
-
-/* Estilos do Canvas */
-#bubbles {
-    position: fixed; /* Garante que o canvas ocupe a tela inteira */
-    top: 0;
-    left: 0;
+.video-placeholder {
     width: 100%;
     height: 100%;
-    z-index: -1; /* Coloca o canvas atrás do conteúdo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Responsividade */
-@media screen and (max-width: 768px) {
-    #main-page {
+.control-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+.control-button {
+    width: 50px;  
+    height: 50px; 
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+#chat-box {
+    flex-grow: 1;
+    background: rgba(255, 255, 255, 0.2);
+    margin-bottom: 10px;
+    padding: 10px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    color: #000; /* Cor do texto no chat em preto */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espaçamento entre mensagens */
+}
+
+#message-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#message-input {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    box-sizing: border-box;
+    resize: none;
+    max-height: 100px; /* Limita a altura do campo de digitação */
+    min-height: 50px; /* Altura mínima do campo de digitação */
+}
+
+#send-button, #skip-button, #report-button {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    padding: 17px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+#send-button {
+    background-color: #28a745;
+    color: rgb(0, 0, 0);
+}
+
+#skip-button {
+    background-color: #ffc107;
+    color: rgb(0, 0, 0);
+}
+
+#report-button {
+    background-color: #dc3545;
+    color: rgb(0, 0, 0);
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 10px;
+    border-radius: 15px;
+    color: #000;
+    word-wrap: break-word;
+    background-color: #f1f1f1; /* Cor do balão de mensagem do usuário */
+    display: inline-block;
+    word-break: break-word;
+    line-height: 1.4;
+    white-space: pre-wrap; /* Preserva espaços e quebras de linha */
+    align-self: flex-start; /* Alinha as mensagens do usuário à esquerda */
+}
+
+.other-message-bubble {
+    max-width: 70%;
+    padding: 10px;
+    border-radius: 15px;
+    color: #000;
+    word-wrap: break-word;
+    background-color: #d4edda; /* Cor do balão de mensagem do outro usuário */
+    display: inline-block;
+    word-break: break-word;
+    line-height: 1.4;
+    white-space: pre-wrap; /* Preserva espaços e quebras de linha */
+    align-self: flex-end; /* Alinha as mensagens do outro usuário à direita */
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    body {
         flex-direction: column;
+    }
+    #left-panel, #chat-panel, #ad-panel {
         width: 100%;
         height: auto;
     }
-
-    .ad-space, #center-login {
-        width: 100%;
-        max-width: 90%;
-        height: auto;
-        max-height: none;
+    #remote-video, #local-video {
+        height: 150px;
+    }
+    #ad-panel {
+        height: 150px;
+        margin-top: 10px;
+    }
+    .control-buttons {
+        margin-top: 5px;
     }
 }

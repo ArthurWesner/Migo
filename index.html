@@ -5,9 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Migo</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const ageVerification = document.getElementById('age-verification');
+            const mainPage = document.getElementById('main-page');
+            
+            document.getElementById('yes-button').addEventListener('click', function() {
+                ageVerification.style.display = 'none';
+                mainPage.style.display = 'flex';
+            });
+
+            document.getElementById('no-button').addEventListener('click', function() {
+                alert('Você precisa ser maior de idade para acessar este site.');
+                window.location.href = 'https://www.google.com';
+            });
+        });
+    </script>
 </head>
 <body>
-    <div id="age-verification">
+    <div id="age-verification" style="position: fixed; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); color: #fff; display: flex; align-items: center; justify-content: center; z-index: 1000;">
         <div>
             <p>Você é maior de idade?</p>
             <button id="yes-button">Sim</button>
@@ -15,30 +31,23 @@
         </div>
     </div>
     
-    <div id="main-page">
+    <div id="main-page" style="display: none;">
         <div class="ad-space" id="left-ad">
-            <!-- Código do Google AdSense aqui -->
-            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({
-                    google_ad_client: "ca-pub-1234567890123456", // Substitua com o seu ID de cliente
-                    enable_page_level_ads: true
-                });
-            </script>
+            <!-- Espaço para anúncios -->
         </div>
         <div id="center-login">
             <div id="logo-container">
-                <img src="D:/Documentos/Desktop/Migo/imagens/logo.png" alt="Logo">
+                <a href="index.html">
+                    <img src="D:/Documentos/Desktop/Migo/imagens/logo.png" alt="Logo">
+                </a>
             </div>
             <form id="login-form">
                 <label for="category">Categoria:</label>
                 <input type="text" id="category" name="category">
-                
                 <button type="submit">Entrar</button>
             </form>
         </div>
         <div class="ad-space" id="right-ad">
-            <!-- Imagem de anúncio -->
             <img src="D:/Documentos/Desktop/Migo/imagens/anuncio.png" alt="Anúncio" style="width: 100%; height: auto;">
         </div>
     </div>

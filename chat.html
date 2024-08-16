@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bate-papo - Migo</title>
     <style>
-        /* Seu CSS existente */
+        /* Estilos base */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -199,192 +199,108 @@
         </div>
         <div class="control-buttons">
             <img src="D:/Documentos/Desktop/Migo/imagens/cam_on.png" alt="Ligar/Desligar Câmera" class="control-button" id="camera-button" onclick="toggleCamera()">
-            <img src="D:/Documentos/Desktop/Migo/imagens/mic_on.png" alt="Ligar/Desligar Microfone" class="control-button" id="microphone-button" onclick="toggleMicrophone()">
+            <img src="D:/Documentos/Desktop/Migo/imagens/mic_on.png" alt="Ligar/Desligar Microfone" class="control-button" id="mic-button" onclick="toggleMic()">
         </div>
     </div>
     <div id="chat-panel">
-        <div id="chat-box">
-            <!-- Mensagens serão adicionadas aqui -->
-        </div>
+        <div id="chat-box"></div>
         <div id="message-container">
-            <textarea id="message-input" placeholder="Digite sua mensagem..."></textarea>
-            <button id="send-button">Enviar</button>
-            <button id="skip-button">Pular</button>
-            <button id="report-button">Denunciar</button>
+            <textarea id="message-input" placeholder="Digite sua mensagem..." onkeydown="handleInput(event)"></textarea>
+            <button id="send-button" onclick="sendMessage()">Enviar</button>
+            <button id="skip-button" onclick="changeUser()">Pular</button>
+            <button id="report-button" onclick="reportUser()">Denunciar</button>
         </div>
     </div>
     <div id="ad-panel">
-        Insira aqui seu anúncio<br>
-        (Tamanho recomendado: 300x600 pixels)
+        <p>Espaço para Anúncios</p>
+        <img src="D:/Documentos/Desktop/Migo/imagens/anuncio_vertical.png" alt="Anúncio">
     </div>
-
     <script>
-        const blockedUsersKey = 'blockedUsers';
-        const userBlocksKey = 'userBlocks';
-
-        let cameraOn = true;
-        let microphoneOn = true;
-        let currentUserId = 'user1'; // ID do usuário atual, você precisa adaptar isso para obter dinamicamente
-        let currentChatUserId = 'user2'; // ID do usuário com quem está conversando, você precisa adaptar isso para obter dinamicamente
-
-        // Solicitar permissão para câmera e microfone
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(function(stream) {
-                const localVideo = document.getElementById('local-video-stream');
-                localVideo.srcObject = stream;
-                localVideo.play();
-            })
-            .catch(function(err) {
-                console.log('Erro ao acessar a câmera ou microfone:', err);
-            });
-
-        function toggleCamera() {
-            const localVideo = document.getElementById('local-video-stream');
-            const cameraButton = document.getElementById('camera-button');
-
-            if (cameraOn) {
-                localVideo.srcObject.getTracks().forEach(track => track.stop());
-                cameraButton.src = 'D:/Documentos/Desktop/Migo/imagens/cam_off.png'; // Imagem de câmera desligada
-            } else {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function(stream) {
-                        localVideo.srcObject = stream;
-                        localVideo.play();
-                    })
-                    .catch(function(err) {
-                        console.log('Erro ao acessar a câmera:', err);
-                    });
-                cameraButton.src = 'D:/Documentos/Desktop/Migo/imagens/cam_on.png'; // Imagem de câmera ligada
-            }
-            cameraOn = !cameraOn;
-        }
-
-        function toggleMicrophone() {
-            const microphoneButton = document.getElementById('microphone-button');
-            const stream = document.getElementById('local-video-stream').srcObject;
-
-            if (microphoneOn) {
-                stream.getAudioTracks().forEach(track => track.enabled = false);
-                microphoneButton.src = 'D:/Documentos/Desktop/Migo/imagens/mic_off.png'; // Imagem de microfone desligado
-            } else {
-                stream.getAudioTracks().forEach(track => track.enabled = true);
-                microphoneButton.src = 'D:/Documentos/Desktop/Migo/imagens/mic_on.png'; // Imagem de microfone ligado
-            }
-            microphoneOn = !microphoneOn;
-        }
-
-        // Recuperar usuários bloqueados
-        function getBlockedUsers() {
-            const blockedUsers = localStorage.getItem(blockedUsersKey);
-            return blockedUsers ? JSON.parse(blockedUsers) : {};
-        }
-
-        // Armazenar usuários bloqueados
-        function setBlockedUsers(blockedUsers) {
-            localStorage.setItem(blockedUsersKey, JSON.stringify(blockedUsers));
-        }
-
-        // Adicionar um usuário à lista de bloqueios
-        function blockUser(userId) {
-            let blockedUsers = getBlockedUsers();
-            blockedUsers[userId] = (blockedUsers[userId] || 0) + 1;
-            setBlockedUsers(blockedUsers);
-
-            if (blockedUsers[userId] >= 3) {
-                alert('Você foi bloqueado por 3 pessoas diferentes. Sua página está indisponível.');
-                document.body.innerHTML = 'Página indisponível';
-                return;
-            }
-
-            // Simular troca de usuário após bloqueio
-            changeUser();
-        }
-
-        // Remover um usuário da lista de bloqueios
-        function unblockUser(userId) {
-            let blockedUsers = getBlockedUsers();
-            delete blockedUsers[userId];
-            setBlockedUsers(blockedUsers);
-        }
-
-        // Enviar mensagem
-        document.getElementById('send-button').addEventListener('click', sendMessage);
-        document.getElementById('message-input').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-        });
-
+        // Função para enviar mensagem
         function sendMessage() {
-            const messageInput = document.getElementById('message-input');
+            const messageInput = document.getElementById("message-input");
             const messageText = messageInput.value.trim();
-            if (messageText) {
-                const chatBox = document.getElementById('chat-box');
-                const messageBubble = document.createElement('div');
-                messageBubble.className = 'message-bubble';
+
+            if (messageText !== "") {
+                const chatBox = document.getElementById("chat-box");
+                const messageBubble = document.createElement("div");
+                messageBubble.className = "message-bubble";
                 messageBubble.textContent = messageText;
                 chatBox.appendChild(messageBubble);
-                messageInput.value = '';
                 chatBox.scrollTop = chatBox.scrollHeight;
+                messageInput.value = "";
+                sendMessageToServer(messageText); // Simular envio da mensagem
             }
         }
 
-        // Pular para o próximo usuário
-        document.getElementById('skip-button').addEventListener('click', function() {
-            changeUser();
-        });
+        // Simular envio de mensagem para o servidor
+        function sendMessageToServer(message) {
+            // Simulação de envio da mensagem para o servidor
+        }
 
-        // Função para trocar de usuário
+        // Função para alternar a câmera
+        function toggleCamera() {
+            const videoStream = document.getElementById("local-video-stream");
+            const cameraButton = document.getElementById("camera-button");
+
+            if (videoStream.srcObject) {
+                videoStream.srcObject.getTracks().forEach(track => track.stop());
+                videoStream.srcObject = null;
+                cameraButton.src = "D:/Documentos/Desktop/Migo/imagens/cam_off.png";
+            } else {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        videoStream.srcObject = stream;
+                        cameraButton.src = "D:/Documentos/Desktop/Migo/imagens/cam_on.png";
+                    })
+                    .catch(error => {
+                        console.error("Erro ao acessar a câmera: ", error);
+                    });
+            }
+        }
+
+        // Função para alternar o microfone
+        function toggleMic() {
+            const micButton = document.getElementById("mic-button");
+
+            // Lógica para ligar/desligar o microfone
+        }
+
+        // Função para pular usuário
         function changeUser() {
-            // Limpar o chat
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML = '';
-
-            // Encontrar próximo usuário
-            findNextUser();
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML = ""; // Limpa o chat
+            // Simular procura por um novo usuário
+            const searchingMessage = document.createElement("div");
+            searchingMessage.textContent = "Procurando alguém para conversar...";
+            searchingMessage.style.textAlign = "center";
+            searchingMessage.style.marginTop = "20px";
+            chatBox.appendChild(searchingMessage);
+            setTimeout(() => {
+                // Simula encontrar um novo usuário
+                chatBox.innerHTML = ""; // Limpa o chat após encontrar o usuário
+            }, 3000);
         }
 
-        // Função para encontrar um novo usuário
-        function findNextUser() {
-            // Simulação de buscar um novo usuário, pode ser substituída pela lógica real
-            console.log('Procurando novo usuário...');
-            // Aqui, adicione a lógica real para encontrar um novo usuário com a mesma categoria
+        // Função para denunciar usuário
+        function reportUser() {
+            alert("Usuário denunciado. Você será redirecionado para o próximo usuário.");
+            changeUser(); // Redireciona para o próximo usuário
         }
 
-        // Detectar tecla Esc para pular de usuário
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
+        // Função para lidar com a entrada no campo de texto
+        function handleInput(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
+                sendMessage();
+            } else if (event.key === "Enter" && event.shiftKey) {
+                event.preventDefault();
+                const messageInput = document.getElementById("message-input");
+                messageInput.value += "\n";
+            } else if (event.key === "Escape") {
                 changeUser();
             }
-        });
-
-        // Denunciar usuário
-        document.getElementById('report-button').addEventListener('click', function() {
-            if (confirm('Você tem certeza de que deseja denunciar este usuário?')) {
-                // Aqui, adicione a lógica para denunciar o usuário
-                alert('Usuário denunciado!');
-                changeUser();
-            }
-        });
-
-        // Exemplo de uso de bloqueio
-        function exampleBlockUser() {
-            const userIdToBlock = 'user_to_block_id'; // Substitua pelo ID do usuário que está sendo bloqueado
-            blockUser(userIdToBlock);
         }
-
-        // Simulação de verificar se o usuário atual está bloqueado
-        function checkUserBlock() {
-            let blockedUsers = getBlockedUsers();
-            if (blockedUsers[currentUserId] >= 3) {
-                document.body.innerHTML = 'Página indisponível';
-            }
-        }
-
-        // Chama a verificação de bloqueio quando a página carrega
-        window.onload = checkUserBlock;
     </script>
 </body>
 </html>
