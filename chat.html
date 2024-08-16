@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bate-papo - Migo</title>
+    <style>
+        /* Seu CSS existente */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #99caf5, #82bdf5);
+            color: #fff;
+            display: flex;
+            height: 100vh;
+            flex-direction: row;
+            overflow: hidden;
+        }
+
+        #left-panel {
+            width: 25%;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        #chat-panel {
+            width: 50%;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+
+        #ad-panel {
+            width: 25%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        #remote-video, #local-video {
+            width: 100%;
+            height: 40%;
+            background: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        .control-button {
+            width: 50px;  
+            height: 50px; 
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        #chat-box {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.2);
+            margin-bottom: 10px;
+            padding: 10px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            color: #000; /* Cor do texto no chat em preto */
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Espaçamento entre mensagens */
+        }
+
+        #message-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            box-sizing: border-box;
+            resize: none;
+            max-height: 100px; /* Limita a altura do campo de digitação */
+            min-height: 50px; /* Altura mínima do campo de digitação */
+        }
+
+        #send-button, #skip-button, #report-button {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            padding: 17px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #send-button {
+            background-color: #28a745;
+            color: rgb(0, 0, 0);
+        }
+
+        #skip-button {
+            background-color: #ffc107;
+            color: rgb(0, 0, 0);
+        }
+
+        #report-button {
+            background-color: #dc3545;
+            color: rgb(0, 0, 0);
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 15px;
+            color: #000;
+            word-wrap: break-word;
+            background-color: #f1f1f1; /* Cor do balão de mensagem do usuário */
+            display: inline-block;
+            word-break: break-word;
+            line-height: 1.4;
+            white-space: pre-wrap; /* Preserva espaços e quebras de linha */
+            align-self: flex-start; /* Alinha as mensagens do usuário à esquerda */
+        }
+
+        .other-message-bubble {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 15px;
+            color: #000;
+            word-wrap: break-word;
+            background-color: #d4edda; /* Cor do balão de mensagem do outro usuário */
+            display: inline-block;
+            word-break: break-word;
+            line-height: 1.4;
+            white-space: pre-wrap; /* Preserva espaços e quebras de linha */
+            align-self: flex-end; /* Alinha as mensagens do outro usuário à direita */
+        }
+
+        /* Estilos responsivos */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            #left-panel, #chat-panel, #ad-panel {
+                width: 100%;
+                height: auto;
+            }
+            #remote-video, #local-video {
+                height: 150px;
+            }
+            #ad-panel {
+                height: 150px;
+                margin-top: 10px;
+            }
+            .control-buttons {
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="left-panel">
+        <div id="remote-video">
+            <div class="video-placeholder" id="remote-placeholder">
+                Imagem do outro usuário
+            </div>
+        </div>
+        <div id="local-video">
+            <video id="local-video-stream" autoplay muted></video>
+        </div>
+        <div class="control-buttons">
+            <img src="D:/Documentos/Desktop/Migo/imagens/cam_on.png" alt="Ligar/Desligar Câmera" class="control-button" id="camera-button" onclick="toggleCamera()">
+            <img src="D:/Documentos/Desktop/Migo/imagens/mic_on.png" alt="Ligar/Desligar Microfone" class="control-button" id="microphone-button" onclick="toggleMicrophone()">
+        </div>
+    </div>
+    <div id="chat-panel">
+        <div id="chat-box">
+            <!-- Mensagens serão adicionadas aqui -->
+        </div>
+        <div id="message-container">
+            <textarea id="message-input" placeholder="Digite sua mensagem..."></textarea>
+            <button id="send-button">Enviar</button>
+            <button id="skip-button">Pular</button>
+            <button id="report-button">Denunciar</button>
+        </div>
+    </div>
+    <div id="ad-panel">
+        Insira aqui seu anúncio<br>
+        (Tamanho recomendado: 300x600 pixels)
+    </div>
+
+    <script>
+        const blockedUsersKey = 'blockedUsers';
+        const userBlocksKey = 'userBlocks';
+
+        let cameraOn = true;
+        let microphoneOn = true;
+        let currentUserId = 'user1'; // ID do usuário atual, você precisa adaptar isso para obter dinamicamente
+        let currentChatUserId = 'user2'; // ID do usuário com quem está conversando, você precisa adaptar isso para obter dinamicamente
+
+        // Solicitar permissão para câmera e microfone
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(function(stream) {
+                const localVideo = document.getElementById('local-video-stream');
+                localVideo.srcObject = stream;
+                localVideo.play();
+            })
+            .catch(function(err) {
+                console.log('Erro ao acessar a câmera ou microfone:', err);
+            });
+
+        function toggleCamera() {
+            const localVideo = document.getElementById('local-video-stream');
+            const cameraButton = document.getElementById('camera-button');
+
+            if (cameraOn) {
+                localVideo.srcObject.getTracks().forEach(track => track.stop());
+                cameraButton.src = 'D:/Documentos/Desktop/Migo/imagens/cam_off.png'; // Imagem de câmera desligada
+            } else {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        localVideo.srcObject = stream;
+                        localVideo.play();
+                    })
+                    .catch(function(err) {
+                        console.log('Erro ao acessar a câmera:', err);
+                    });
+                cameraButton.src = 'D:/Documentos/Desktop/Migo/imagens/cam_on.png'; // Imagem de câmera ligada
+            }
+            cameraOn = !cameraOn;
+        }
+
+        function toggleMicrophone() {
+            const microphoneButton = document.getElementById('microphone-button');
+            const stream = document.getElementById('local-video-stream').srcObject;
+
+            if (microphoneOn) {
+                stream.getAudioTracks().forEach(track => track.enabled = false);
+                microphoneButton.src = 'D:/Documentos/Desktop/Migo/imagens/mic_off.png'; // Imagem de microfone desligado
+            } else {
+                stream.getAudioTracks().forEach(track => track.enabled = true);
+                microphoneButton.src = 'D:/Documentos/Desktop/Migo/imagens/mic_on.png'; // Imagem de microfone ligado
+            }
+            microphoneOn = !microphoneOn;
+        }
+
+        // Recuperar usuários bloqueados
+        function getBlockedUsers() {
+            const blockedUsers = localStorage.getItem(blockedUsersKey);
+            return blockedUsers ? JSON.parse(blockedUsers) : {};
+        }
+
+        // Armazenar usuários bloqueados
+        function setBlockedUsers(blockedUsers) {
+            localStorage.setItem(blockedUsersKey, JSON.stringify(blockedUsers));
+        }
+
+        // Adicionar um usuário à lista de bloqueios
+        function blockUser(userId) {
+            let blockedUsers = getBlockedUsers();
+            blockedUsers[userId] = (blockedUsers[userId] || 0) + 1;
+            setBlockedUsers(blockedUsers);
+
+            if (blockedUsers[userId] >= 3) {
+                alert('Você foi bloqueado por 3 pessoas diferentes. Sua página está indisponível.');
+                document.body.innerHTML = 'Página indisponível';
+                return;
+            }
+
+            // Simular troca de usuário após bloqueio
+            changeUser();
+        }
+
+        // Remover um usuário da lista de bloqueios
+        function unblockUser(userId) {
+            let blockedUsers = getBlockedUsers();
+            delete blockedUsers[userId];
+            setBlockedUsers(blockedUsers);
+        }
+
+        // Enviar mensagem
+        document.getElementById('send-button').addEventListener('click', sendMessage);
+        document.getElementById('message-input').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const messageText = messageInput.value.trim();
+            if (messageText) {
+                const chatBox = document.getElementById('chat-box');
+                const messageBubble = document.createElement('div');
+                messageBubble.className = 'message-bubble';
+                messageBubble.textContent = messageText;
+                chatBox.appendChild(messageBubble);
+                messageInput.value = '';
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        // Pular para o próximo usuário
+        document.getElementById('skip-button').addEventListener('click', function() {
+            changeUser();
+        });
+
+        // Função para trocar de usuário
+        function changeUser() {
+            // Limpar o chat
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '';
+
+            // Encontrar próximo usuário
+            findNextUser();
+        }
+
+        // Função para encontrar um novo usuário
+        function findNextUser() {
+            // Simulação de buscar um novo usuário, pode ser substituída pela lógica real
+            console.log('Procurando novo usuário...');
+            // Aqui, adicione a lógica real para encontrar um novo usuário com a mesma categoria
+        }
+
+        // Detectar tecla Esc para pular de usuário
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                changeUser();
+            }
+        });
+
+        // Denunciar usuário
+        document.getElementById('report-button').addEventListener('click', function() {
+            if (confirm('Você tem certeza de que deseja denunciar este usuário?')) {
+                // Aqui, adicione a lógica para denunciar o usuário
+                alert('Usuário denunciado!');
+                changeUser();
+            }
+        });
+
+        // Exemplo de uso de bloqueio
+        function exampleBlockUser() {
+            const userIdToBlock = 'user_to_block_id'; // Substitua pelo ID do usuário que está sendo bloqueado
+            blockUser(userIdToBlock);
+        }
+
+        // Simulação de verificar se o usuário atual está bloqueado
+        function checkUserBlock() {
+            let blockedUsers = getBlockedUsers();
+            if (blockedUsers[currentUserId] >= 3) {
+                document.body.innerHTML = 'Página indisponível';
+            }
+        }
+
+        // Chama a verificação de bloqueio quando a página carrega
+        window.onload = checkUserBlock;
+    </script>
+</body>
+</html>
