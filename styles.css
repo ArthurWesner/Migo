@@ -65,6 +65,12 @@ body {
     opacity: 1;
 }
 
+.ad-space, #center-login {
+    width: 25vw; /* 25% da largura da janela de visualização */
+    height: 30vh; /* 30% da altura da janela de visualização */
+}
+
+
 /* Estilos para os retângulos de anúncio e login */
 .ad-space, #center-login {
     background-color: #fff;
