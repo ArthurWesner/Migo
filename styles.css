@@ -54,7 +54,7 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 80%;
-    height: 80%;
+    max-width: 1000px; /* Limita o tamanho máximo da página principal */
     gap: 20px; /* Espaçamento entre os retângulos */
     z-index: 1; /* Garantir que a página principal esteja atrás da tela de verificação */
     transition: opacity 0.5s ease-in-out; /* Transição suave ao mostrar/esconder */
@@ -142,18 +142,4 @@ body {
     width: 100%;
     height: 100%;
     z-index: 0; /* Coloca o canvas atrás do conteúdo */
-}
-
-/* Estilo para o espaço de anúncios */
-.ad-space {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 30%; /* Ajuste a largura conforme necessário */
-    height: 300px; /* Ajuste a altura conforme necessário */
-    overflow: hidden; /* Evita que o conteúdo saia do retângulo */
 }
