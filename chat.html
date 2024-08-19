@@ -54,10 +54,9 @@
             margin-bottom: 10px;
         }
 
-
         #remote-video, #local-video {
             width: 105%;
-            height: 150%;
+            height: 350px;
             background: #333;
             margin-bottom: 10px;
             display: flex;
@@ -66,7 +65,6 @@
             color: #888;
             position: relative;
             overflow: hidden;
-            transform: scaleX(-1) scale(1.0); /* Ajusta o zoom para aumentar o tamanho */
             object-fit: cover; /* Ajusta o enquadramento para cobrir o elemento */
         }
 
@@ -82,7 +80,6 @@
             display: flex;
             justify-content: center;
             margin-top: 10px;
-           
         }
 
         .control-button {
@@ -167,12 +164,25 @@
             border-radius: 15px;
             color: #000;
             word-wrap: break-word;
-            background-color: #d4edda; /* Cor do balão de mensagem do outro usuário */
+            background-color: #c0f1cc; /* Cor do balão de mensagem do outro usuário */
             display: inline-block;
             word-break: break-word;
             line-height: 1.4;
             white-space: pre-wrap; /* Preserva espaços e quebras de linha */
             align-self: flex-end; /* Alinha as mensagens do outro usuário à direita */
+        }
+
+        .message-placeholder {
+            display: none; /* Inicialmente escondido */
+            position: absolute; /* Para centralizar sobre o vídeo */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centraliza horizontal e verticalmente */
+            color: #888;
+            font-size: 12px; /* Tamanho da fonte */
+            background: rgba(0, 0, 0, 0.5); /* Fundo escuro com opacidade */
+            padding: 10px;
+            border-radius: 8px;
         }
 
         /* Estilos responsivos */
@@ -200,10 +210,8 @@
 <body>
     <div id="left-panel">
         <div id="remote-video">
-            <div class="video-placeholder" id="remote-placeholder">
-                Imagem do outro usuário
-            </div>
             <video id="remote-video-stream" autoplay></video>
+            <div id="remote-message" class="message-placeholder">Procurando por um novo usuário.</div>
         </div>
         <div id="local-video">
             <video id="local-video-stream" autoplay muted></video>
@@ -230,15 +238,8 @@
     </div>
 
     <script>
-        const blockedUsersKey = 'blockedUsers';
-        const userBlocksKey = 'userBlocks';
-
         let cameraOn = true;
         let microphoneOn = true;
-        let currentUserId = 'user1'; // ID do usuário atual, você precisa adaptar isso para obter dinamicamente
-        let currentChatUserId = 'user2'; // ID do usuário com quem está conversando, você precisa adaptar isso para obter dinamicamente
-
-        const peerConnection = new RTCPeerConnection(); // Criação da conexão WebRTC
 
         // Solicitar permissão para câmera e microfone
         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -246,143 +247,153 @@
                 const localVideo = document.getElementById('local-video-stream');
                 localVideo.srcObject = stream;
                 localVideo.play();
-
-                // Adicionar o stream local à conexão peer
-                stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
             })
             .catch(function(err) {
                 console.log('Erro ao acessar a câmera ou microfone:', err);
             });
 
-        // Receber stream remoto
-        peerConnection.ontrack = function(event) {
+        function checkUserConnection() {
+            const remoteMessage = document.getElementById('remote-message');
             const remoteVideo = document.getElementById('remote-video-stream');
-            remoteVideo.srcObject = event.streams[0];
-            remoteVideo.play();
 
-            // Esconder o placeholder quando o vídeo remoto for exibido
-            document.getElementById('remote-placeholder').style.display = 'none';
-        };
+            // Se o vídeo remoto estiver vazio (ou seja, sem stream), mostrar a mensagem
+            if (!remoteVideo.srcObject) {
+                remoteMessage.style.display = 'block'; // Mostrar mensagem
+            } else {
+                remoteMessage.style.display = 'none'; // Ocultar mensagem
+            }
+        }
+
+        // Verificar a conexão quando o usuário encontrar alguém
+        setInterval(checkUserConnection, 1000); // Checar a cada 1 segundo
 
         function toggleCamera() {
             const localVideo = document.getElementById('local-video-stream');
             const cameraButton = document.getElementById('camera-button');
+            const stream = localVideo.srcObject;
 
             if (cameraOn) {
-                localVideo.srcObject.getTracks().forEach(track => track.stop());
-                cameraButton.src = 'imagens/cam_off.png'; // Imagem de câmera desligada
+                // Desligar a câmera
+                if (stream) {
+                    let tracks = stream.getVideoTracks();
+                    tracks.forEach(track => track.stop());
+                }
+                cameraButton.src = "imagens/cam_off.png";
+                localVideo.innerHTML = '<div class="message-placeholder">Estou tímido.</div>';
             } else {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function(stream) {
-                        localVideo.srcObject = stream;
+                // Ligar a câmera
+                navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                    .then(function(newStream) {
+                        localVideo.srcObject = newStream;
                         localVideo.play();
-
-                        // Adicionar novamente as tracks à conexão peer
-                        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+                    })
+                    .catch(function(err) {
+                        console.log('Erro ao ligar a câmera:', err);
                     });
-                cameraButton.src = 'imagens/cam_on.png'; // Imagem de câmera ligada
+                cameraButton.src = "imagens/cam_on.png";
             }
-
             cameraOn = !cameraOn;
         }
 
         function toggleMicrophone() {
+            const localVideo = document.getElementById('local-video-stream');
             const microphoneButton = document.getElementById('microphone-button');
-            const audioTracks = document.getElementById('local-video-stream').srcObject.getAudioTracks();
+            const stream = localVideo.srcObject;
 
             if (microphoneOn) {
-                audioTracks.forEach(track => track.enabled = false);
-                microphoneButton.src = 'imagens/mic_off.png'; // Imagem de microfone desligado
+                // Desligar o microfone
+                if (stream) {
+                    let tracks = stream.getAudioTracks();
+                    tracks.forEach(track => track.stop());
+                }
+                microphoneButton.src = "imagens/mic_off.png";
             } else {
-                audioTracks.forEach(track => track.enabled = true);
-                microphoneButton.src = 'imagens/mic_on.png'; // Imagem de microfone ligado
+                // Ligar o microfone
+                navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+                    .then(function(newStream) {
+                        localVideo.srcObject = newStream;
+                        localVideo.play();
+                    })
+                    .catch(function(err) {
+                        console.log('Erro ao ligar o microfone:', err);
+                    });
+                microphoneButton.src = "imagens/mic_on.png";
             }
-
             microphoneOn = !microphoneOn;
         }
 
-        function reportUser() {
-            let blockedUsers = JSON.parse(localStorage.getItem(blockedUsersKey)) || {};
-            let userBlocks = JSON.parse(localStorage.getItem(userBlocksKey)) || {};
-
-            if (!blockedUsers[currentUserId]) {
-                blockedUsers[currentUserId] = [];
-            }
-
-            blockedUsers[currentUserId].push(currentChatUserId);
-
-            userBlocks[currentChatUserId] = (userBlocks[currentChatUserId] || 0) + 1;
-
-            localStorage.setItem(blockedUsersKey, JSON.stringify(blockedUsers));
-            localStorage.setItem(userBlocksKey, JSON.stringify(userBlocks));
-
-            if (userBlocks[currentChatUserId] >= 2) {
-                // Banir o usuário por 48 horas
-                const banUntil = new Date();
-                banUntil.setHours(banUntil.getHours() + 48);
-                localStorage.setItem('ban-' + currentChatUserId, banUntil.getTime());
-            }
-
-            skipUser();
-        }
-
-        function skipUser() {
-            // Limpa o chat e busca um novo usuário para conversar
-            document.getElementById('chat-box').innerHTML = '';
-            currentChatUserId = findNextUser();
-
-            // Lógica para estabelecer conexão com o próximo usuário...
-        }
-
-        function findNextUser() {
-            // Lógica para encontrar um novo usuário
-            // Aqui você deve implementar a lógica de buscar um usuário online
-            // Priorizar a categoria da conversa, se possível
-            return 'newUserId'; // Retorne o novo ID de usuário
-        }
-
-        document.getElementById('send-button').addEventListener('click', sendMessage);
-        document.getElementById('skip-button').addEventListener('click', skipUser);
-        document.getElementById('report-button').addEventListener('click', reportUser);
-
-        document.getElementById('message-input').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            } else if (e.key === 'Escape') {
-                skipUser();
+        document.getElementById('send-button').addEventListener('click', function() {
+            // Função para enviar a mensagem
+            const messageInput = document.getElementById('message-input');
+            const messageText = messageInput.value.trim();
+            if (messageText) {
+                const chatBox = document.getElementById('chat-box');
+                const messageBubble = document.createElement('div');
+                messageBubble.className = 'message-bubble';
+                messageBubble.textContent = messageText;
+                chatBox.appendChild(messageBubble);
+                messageInput.value = '';
+                chatBox.scrollTop = chatBox.scrollHeight;
             }
         });
 
-        function sendMessage() {
-            const messageInput = document.getElementById('message-input');
-            const message = messageInput.value.trim();
+        document.getElementById('skip-button').addEventListener('click', function() {
+            // Função para pular para o próximo usuário
+            console.log('Pulando para o próximo usuário...');
+            clearChat();
+            // Implementar a lógica para pular para o próximo usuário
+        });
 
-            if (message) {
-                const chatBox = document.getElementById('chat-box');
+        document.getElementById('report-button').addEventListener('click', function() {
+            // Função para denunciar o usuário
+            console.log('Denunciando o usuário...');
+            // Implementar a lógica para denunciar o usuário
+        });
 
-                const messageBubble = document.createElement('div');
-                messageBubble.className = 'message-bubble';
-                messageBubble.innerText = message;
+        document.getElementById('message-input').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // Evita quebra de linha
+                document.getElementById('send-button').click();
+            }
+        });
 
-                chatBox.appendChild(messageBubble);
-                chatBox.scrollTop = chatBox.scrollHeight; // Rola para a última mensagem
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.getElementById('skip-button').click();
+            }
+        });
 
-                // Enviar a mensagem ao outro usuário (integração com a comunicação via WebRTC necessária)
-                // peerConnection.send(message);
-
-                messageInput.value = '';
+        // Atualiza o enquadramento da câmera
+        function updateCameraFrame() {
+            const localVideo = document.getElementById('local-video');
+            const stream = localVideo.querySelector('video').srcObject;
+            if (stream) {
+                let videoTracks = stream.getVideoTracks();
+                if (videoTracks.length > 0) {
+                    let track = videoTracks[0];
+                    let settings = track.getSettings();
+                    localVideo.style.objectFit = 'cover';
+                    localVideo.style.transform = `scale(${settings.aspectRatio})`;
+                }
             }
         }
 
-        // Verificar se o usuário foi banido
-        const banUntil = localStorage.getItem('ban-' + currentUserId);
-        if (banUntil && new Date().getTime() < banUntil) {
-            alert('Você está banido por 48 horas.');
-            // Redirecionar ou impedir o acesso ao chat
+        // Chama a função para ajustar o enquadramento da câmera
+        updateCameraFrame();
+
+        // Limpa o chat quando um novo usuário é encontrado
+        function clearChat() {
+            document.getElementById('chat-box').innerHTML = '';
         }
 
-        // Implementar funcionalidade de reconexão, etc.
+        // Exemplo de chamada para limpar o chat
+        clearChat();
+
+        // Atualizar a visualização quando um novo usuário é encontrado
+        function onNewUserFound() {
+            clearChat();
+            // Adicione sua lógica para buscar um novo usuário aqui
+        }
     </script>
 </body>
 </html>
