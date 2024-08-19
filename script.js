@@ -75,14 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('ageGroup', 'adult');
         ageVerification.style.display = 'none';
         mainPage.classList.add('show');
-        mainPage.classList.remove('hidden');
     });
 
     noButton.addEventListener('click', function() {
         localStorage.setItem('ageGroup', 'minor');
         ageVerification.style.display = 'none';
         mainPage.classList.add('show');
-        mainPage.classList.remove('hidden');
     });
 
     // Lógica de Login
