@@ -193,13 +193,14 @@
             <div class="video-placeholder" id="remote-placeholder">
                 Imagem do outro usuário
             </div>
+            <video id="remote-video-stream" autoplay></video>
         </div>
         <div id="local-video">
             <video id="local-video-stream" autoplay muted></video>
         </div>
         <div class="control-buttons">
-            <img src="D:/Documentos/Desktop/Migo/imagens/cam_on.png" alt="Ligar/Desligar Câmera" class="control-button" id="camera-button" onclick="toggleCamera()">
-            <img src="D:/Documentos/Desktop/Migo/imagens/mic_on.png" alt="Ligar/Desligar Microfone" class="control-button" id="microphone-button" onclick="toggleMicrophone()">
+            <img src="cam_on.png" alt="Ligar/Desligar Câmera" class="control-button" id="camera-button" onclick="toggleCamera()">
+            <img src="imagens/mic_on.png" alt="Ligar/Desligar Microfone" class="control-button" id="microphone-button" onclick="toggleMicrophone()">
         </div>
     </div>
     <div id="chat-panel">
@@ -227,16 +228,31 @@
         let currentUserId = 'user1'; // ID do usuário atual, você precisa adaptar isso para obter dinamicamente
         let currentChatUserId = 'user2'; // ID do usuário com quem está conversando, você precisa adaptar isso para obter dinamicamente
 
+        const peerConnection = new RTCPeerConnection(); // Criação da conexão WebRTC
+
         // Solicitar permissão para câmera e microfone
         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
             .then(function(stream) {
                 const localVideo = document.getElementById('local-video-stream');
                 localVideo.srcObject = stream;
                 localVideo.play();
+
+                // Adicionar o stream local à conexão peer
+                stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
             })
             .catch(function(err) {
                 console.log('Erro ao acessar a câmera ou microfone:', err);
             });
+
+        // Receber stream remoto
+        peerConnection.ontrack = function(event) {
+            const remoteVideo = document.getElementById('remote-video-stream');
+            remoteVideo.srcObject = event.streams[0];
+            remoteVideo.play();
+
+            // Esconder o placeholder quando o vídeo remoto for exibido
+            document.getElementById('remote-placeholder').style.display = 'none';
+        };
 
         function toggleCamera() {
             const localVideo = document.getElementById('local-video-stream');
@@ -250,141 +266,113 @@
                     .then(function(stream) {
                         localVideo.srcObject = stream;
                         localVideo.play();
-                    })
-                    .catch(function(err) {
-                        console.log('Erro ao acessar a câmera:', err);
+
+                        // Adicionar novamente as tracks à conexão peer
+                        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
                     });
                 cameraButton.src = 'D:/Documentos/Desktop/Migo/imagens/cam_on.png'; // Imagem de câmera ligada
             }
+
             cameraOn = !cameraOn;
         }
 
         function toggleMicrophone() {
             const microphoneButton = document.getElementById('microphone-button');
-            const stream = document.getElementById('local-video-stream').srcObject;
+            const audioTracks = document.getElementById('local-video-stream').srcObject.getAudioTracks();
 
             if (microphoneOn) {
-                stream.getAudioTracks().forEach(track => track.enabled = false);
+                audioTracks.forEach(track => track.enabled = false);
                 microphoneButton.src = 'D:/Documentos/Desktop/Migo/imagens/mic_off.png'; // Imagem de microfone desligado
             } else {
-                stream.getAudioTracks().forEach(track => track.enabled = true);
+                audioTracks.forEach(track => track.enabled = true);
                 microphoneButton.src = 'D:/Documentos/Desktop/Migo/imagens/mic_on.png'; // Imagem de microfone ligado
             }
+
             microphoneOn = !microphoneOn;
         }
 
-        // Recuperar usuários bloqueados
-        function getBlockedUsers() {
-            const blockedUsers = localStorage.getItem(blockedUsersKey);
-            return blockedUsers ? JSON.parse(blockedUsers) : {};
-        }
+        function reportUser() {
+            let blockedUsers = JSON.parse(localStorage.getItem(blockedUsersKey)) || {};
+            let userBlocks = JSON.parse(localStorage.getItem(userBlocksKey)) || {};
 
-        // Armazenar usuários bloqueados
-        function setBlockedUsers(blockedUsers) {
-            localStorage.setItem(blockedUsersKey, JSON.stringify(blockedUsers));
-        }
-
-        // Adicionar um usuário à lista de bloqueios
-        function blockUser(userId) {
-            let blockedUsers = getBlockedUsers();
-            blockedUsers[userId] = (blockedUsers[userId] || 0) + 1;
-            setBlockedUsers(blockedUsers);
-
-            if (blockedUsers[userId] >= 3) {
-                alert('Você foi bloqueado por 3 pessoas diferentes. Sua página está indisponível.');
-                document.body.innerHTML = 'Página indisponível';
-                return;
+            if (!blockedUsers[currentUserId]) {
+                blockedUsers[currentUserId] = [];
             }
 
-            // Simular troca de usuário após bloqueio
-            changeUser();
+            blockedUsers[currentUserId].push(currentChatUserId);
+
+            userBlocks[currentChatUserId] = (userBlocks[currentChatUserId] || 0) + 1;
+
+            localStorage.setItem(blockedUsersKey, JSON.stringify(blockedUsers));
+            localStorage.setItem(userBlocksKey, JSON.stringify(userBlocks));
+
+            if (userBlocks[currentChatUserId] >= 2) {
+                // Banir o usuário por 48 horas
+                const banUntil = new Date();
+                banUntil.setHours(banUntil.getHours() + 48);
+                localStorage.setItem('ban-' + currentChatUserId, banUntil.getTime());
+            }
+
+            skipUser();
         }
 
-        // Remover um usuário da lista de bloqueios
-        function unblockUser(userId) {
-            let blockedUsers = getBlockedUsers();
-            delete blockedUsers[userId];
-            setBlockedUsers(blockedUsers);
+        function skipUser() {
+            // Limpa o chat e busca um novo usuário para conversar
+            document.getElementById('chat-box').innerHTML = '';
+            currentChatUserId = findNextUser();
+
+            // Lógica para estabelecer conexão com o próximo usuário...
         }
 
-        // Enviar mensagem
+        function findNextUser() {
+            // Lógica para encontrar um novo usuário
+            // Aqui você deve implementar a lógica de buscar um usuário online
+            // Priorizar a categoria da conversa, se possível
+            return 'newUserId'; // Retorne o novo ID de usuário
+        }
+
         document.getElementById('send-button').addEventListener('click', sendMessage);
-        document.getElementById('message-input').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
+        document.getElementById('skip-button').addEventListener('click', skipUser);
+        document.getElementById('report-button').addEventListener('click', reportUser);
+
+        document.getElementById('message-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendMessage();
+            } else if (e.key === 'Escape') {
+                skipUser();
             }
         });
 
         function sendMessage() {
             const messageInput = document.getElementById('message-input');
-            const messageText = messageInput.value.trim();
-            if (messageText) {
+            const message = messageInput.value.trim();
+
+            if (message) {
                 const chatBox = document.getElementById('chat-box');
+
                 const messageBubble = document.createElement('div');
                 messageBubble.className = 'message-bubble';
-                messageBubble.textContent = messageText;
+                messageBubble.innerText = message;
+
                 chatBox.appendChild(messageBubble);
+                chatBox.scrollTop = chatBox.scrollHeight; // Rola para a última mensagem
+
+                // Enviar a mensagem ao outro usuário (integração com a comunicação via WebRTC necessária)
+                // peerConnection.send(message);
+
                 messageInput.value = '';
-                chatBox.scrollTop = chatBox.scrollHeight;
             }
         }
 
-        // Pular para o próximo usuário
-        document.getElementById('skip-button').addEventListener('click', function() {
-            changeUser();
-        });
-
-        // Função para trocar de usuário
-        function changeUser() {
-            // Limpar o chat
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML = '';
-
-            // Encontrar próximo usuário
-            findNextUser();
+        // Verificar se o usuário foi banido
+        const banUntil = localStorage.getItem('ban-' + currentUserId);
+        if (banUntil && new Date().getTime() < banUntil) {
+            alert('Você está banido por 48 horas.');
+            // Redirecionar ou impedir o acesso ao chat
         }
 
-        // Função para encontrar um novo usuário
-        function findNextUser() {
-            // Simulação de buscar um novo usuário, pode ser substituída pela lógica real
-            console.log('Procurando novo usuário...');
-            // Aqui, adicione a lógica real para encontrar um novo usuário com a mesma categoria
-        }
-
-        // Detectar tecla Esc para pular de usuário
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                event.preventDefault();
-                changeUser();
-            }
-        });
-
-        // Denunciar usuário
-        document.getElementById('report-button').addEventListener('click', function() {
-            if (confirm('Você tem certeza de que deseja denunciar este usuário?')) {
-                // Aqui, adicione a lógica para denunciar o usuário
-                alert('Usuário denunciado!');
-                changeUser();
-            }
-        });
-
-        // Exemplo de uso de bloqueio
-        function exampleBlockUser() {
-            const userIdToBlock = 'user_to_block_id'; // Substitua pelo ID do usuário que está sendo bloqueado
-            blockUser(userIdToBlock);
-        }
-
-        // Simulação de verificar se o usuário atual está bloqueado
-        function checkUserBlock() {
-            let blockedUsers = getBlockedUsers();
-            if (blockedUsers[currentUserId] >= 3) {
-                document.body.innerHTML = 'Página indisponível';
-            }
-        }
-
-        // Chama a verificação de bloqueio quando a página carrega
-        window.onload = checkUserBlock;
+        // Implementar funcionalidade de reconexão, etc.
     </script>
 </body>
 </html>
