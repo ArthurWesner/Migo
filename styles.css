@@ -3,7 +3,6 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -53,8 +52,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 80%;
-    max-width: 1000px; /* Limita o tamanho máximo da página principal */
+    width: 100%; /* Use a largura total da tela */
+    max-width: 1200px; /* Limita o tamanho máximo da página principal */
     gap: 20px; /* Espaçamento entre os retângulos */
     z-index: 1; /* Garantir que a página principal esteja atrás da tela de verificação */
     transition: opacity 0.5s ease-in-out; /* Transição suave ao mostrar/esconder */
@@ -67,7 +66,7 @@ body {
 }
 
 /* Estilos para os retângulos de anúncio e login */
-#center-login {
+.ad-space, #center-login {
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -75,7 +74,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-   
+    align-items: center;
     width: 30%; /* Tamanho fixo para todos os retângulos */
     height: 300px; /* Altura fixa para todos os retângulos */
 }
