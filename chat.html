@@ -199,7 +199,7 @@
             <video id="local-video-stream" autoplay muted></video>
         </div>
         <div class="control-buttons">
-            <img src="cam_on.png" alt="Ligar/Desligar Câmera" class="control-button" id="camera-button" onclick="toggleCamera()">
+            <img src="imagens/cam_on.png" alt="Ligar/Desligar Câmera" class="control-button" id="camera-button" onclick="toggleCamera()">
             <img src="imagens/mic_on.png" alt="Ligar/Desligar Microfone" class="control-button" id="microphone-button" onclick="toggleMicrophone()">
         </div>
     </div>
@@ -260,7 +260,7 @@
 
             if (cameraOn) {
                 localVideo.srcObject.getTracks().forEach(track => track.stop());
-                cameraButton.src = 'D:/Documentos/Desktop/Migo/imagens/cam_off.png'; // Imagem de câmera desligada
+                cameraButton.src = 'imagens/cam_off.png'; // Imagem de câmera desligada
             } else {
                 navigator.mediaDevices.getUserMedia({ video: true })
                     .then(function(stream) {
@@ -270,7 +270,7 @@
                         // Adicionar novamente as tracks à conexão peer
                         stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
                     });
-                cameraButton.src = 'D:/Documentos/Desktop/Migo/imagens/cam_on.png'; // Imagem de câmera ligada
+                cameraButton.src = 'imagens/cam_on.png'; // Imagem de câmera ligada
             }
 
             cameraOn = !cameraOn;
