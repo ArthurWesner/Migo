@@ -79,8 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     noButton.addEventListener('click', function() {
         localStorage.setItem('ageGroup', 'minor');
-        ageVerification.style.display = 'none';
-        mainPage.classList.add('show');
+        window.location.href = "https://www.google.com"; // Redireciona para uma outra página
     });
 
     // Lógica de Login
