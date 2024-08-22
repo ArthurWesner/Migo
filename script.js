@@ -93,3 +93,23 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = `chat.html?category=${encodeURIComponent(category)}&ageGroup=${encodeURIComponent(ageGroup)}`;
     });
 });
+
+
+const ws = new WebSocket('ws://localhost:8080');
+
+ws.onopen = () => {
+    console.log('Conectado ao servidor WebSocket');
+};
+
+ws.onmessage = (event) => {
+    console.log('Mensagem recebida: ', event.data);
+};
+
+ws.onclose = () => {
+    console.log('Desconectado do servidor WebSocket');
+};
+
+// Enviar mensagem ao servidor
+function sendMessage(message) {
+    ws.send(message);
+}

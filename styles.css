@@ -11,43 +11,6 @@ body {
 }
 
 
-/* Página Principal */
-#main-page {
-    display: flex;
-    justify-content: space-between; /* Espaça igualmente os retângulos */
-    align-items: center;
-    width: 100%; /* Use a largura total da tela */
-    max-width: 1200px; /* Limita o tamanho máximo da página principal */
-    margin: 0 auto; /* Centraliza o conteúdo */
-    gap: 20px; /* Espaçamento entre os retângulos */
-}
-
-/* Estilos para os retângulos de anúncio e login */
-.ad-space, #center-login {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    flex: 1; /* Faz os retângulos ocupar a mesma proporção */
-    height: 300px; /* Altura fixa para todos os retângulos */
-    box-sizing: border-box; /* Inclui padding e border na largura e altura */
-}
-
-#center-login {
-    max-width: 40%; /* Ajuste o tamanho máximo do retângulo central */
-    flex: 1.5; /* O retângulo central ocupa um pouco mais de espaço */
-}
-
-/* Contêiner do Logo */
-#logo-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-#logo-container img {
-    max-width: 70%; /* Ajuste o tamanho máximo conforme necessário */
-    height: auto;
-}
 
 
 /* Tela de Verificação de Idade */
