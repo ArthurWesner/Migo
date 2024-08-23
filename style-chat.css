@@ -197,3 +197,15 @@ body {
         margin-top: 5px;
     }
 }
+
+#conversation-header {
+    background-color: #f1f1f1; /* Cor de fundo */
+    padding: 10px;
+    border-bottom: 1px solid #ccc; /* Linha abaixo do cabeçalho */
+    font-weight: bold;
+    text-align: center;
+}
+
+#conversation-header span {
+    color: #333; /* Cor do nome do usuário */
+}

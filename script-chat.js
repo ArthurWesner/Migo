@@ -64,10 +64,15 @@ function createPeerConnection() {
                 type: 'answer',
                 answer: answer
             }));
+
+            // Atualizar o cabeçalho com o nome do usuário remoto
+            updateConversationHeader(message.username); // Supondo que o nome do usuário seja enviado como parte da mensagem de oferta
         } else if (message.type === 'answer') {
             await peerConnection.setRemoteDescription(new RTCSessionDescription(message.answer));
         } else if (message.type === 'candidate') {
             await peerConnection.addIceCandidate(new RTCIceCandidate(message.candidate));
+        } else if (message.type === 'no_user') {
+            updateConversationHeader(null); // Esconder a mensagem quando não há usuários disponíveis
         }
     };
 }
@@ -148,7 +153,15 @@ function sendMessage() {
     }
 }
 
-// Manipular o botão "Pular"
+// Função para manipular o botão "Pular"
+function skipUser() {
+    document.getElementById('chat-box').innerHTML = '';
+    socket.send(JSON.stringify({ type: 'skip' }));
+
+    // Limpar o cabeçalho da conversa
+    updateConversationHeader(null);
+}
+
 document.getElementById('skip-button').onclick = skipUser;
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
@@ -156,13 +169,19 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-function skipUser() {
-    document.getElementById('chat-box').innerHTML = '';
-    socket.send(JSON.stringify({ type: 'skip' }));
-}
-
 // Manipular o botão "Denunciar"
 document.getElementById('report-button').onclick = function() {
     // Função para denunciar o usuário
     socket.send(JSON.stringify({ type: 'report' }));
 };
+
+function updateConversationHeader(username) {
+    const headerElement = document.getElementById('conversation-header');
+    const usernameElement = document.getElementById('remote-user-name');
+    if (username) {
+        usernameElement.textContent = username;
+        headerElement.style.display = 'block';
+    } else {
+        headerElement.style.display = 'none';
+    }
+}
