@@ -10,31 +10,37 @@
     <div id="age-verification">
         <div>
             <p>Você é maior de idade?</p>
-            <button id="yes-button">Sim</button>
-            <button id="no-button">Não</button>
+            <button id="verify-age-yes">Sim</button>
+            <button id="verify-age-no">Não</button>
         </div>
     </div>
-
-    <div id="main-page">
-        <div class="ad-space" id="left-ad">
-            <!-- Código do Google AdSense aqui -->
+    <div id="rectangles-container" style="display: none;">
+        <div id="ad-left" class="ad-space">
+            <!-- Código para anúncios do Google -->
         </div>
         <div id="center-login">
             <div id="logo-container">
                 <img src="imagens/logo.png" alt="Logo">
             </div>
             <form id="login-form">
+                <label for="username">Nome de usuário:</label>
+                <input type="text" id="username" name="username" required>                
                 <label for="category">Categoria:</label>
                 <input type="text" id="category" name="category">
                 <button type="submit">Entrar</button>
             </form>
+            <div id="language-buttons">
+                <button type="button" class="language-button" data-lang="en">English</button>
+                <button type="button" class="language-button" data-lang="es">Español</button>
+                <button type="button" class="language-button" data-lang="pt">Português</button>
+            </div>
         </div>
-        <div class="ad-space" id="right-ad">
-            <img src="imagens/anuncio.png" alt="Anúncio" style="width: 100%; height: auto;">
+        <div id="ad-right" class="ad-space">
+            <img src="imagens/anuncio.png" alt="Anúncio" class="ad-image">
         </div>
     </div>
-    
-
+    <div id="main-page" style="display: none;">
+    </div>
     <canvas id="bubbles"></canvas>
     <script src="script.js"></script>
 </body>

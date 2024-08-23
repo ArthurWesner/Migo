@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.x = x;
             this.y = y;
             this.radius = radius;
-            this.dx = (Math.random() - 0.5) * 2;
-            this.dy = (Math.random() - 0.5) * 2;
+            this.dx = (Math.random() - 0.5) * 2; // Velocidade horizontal
+            this.dy = (Math.random() - 0.5) * 2; // Velocidade vertical
             this.alpha = Math.random() * 0.5 + 0.3;
         }
 
@@ -63,53 +63,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', resizeCanvas);
 
-    // Elementos do DOM
-    const ageVerification = document.getElementById('age-verification');
-    const yesButton = document.getElementById('yes-button');
-    const noButton = document.getElementById('no-button');
-    const mainPage = document.getElementById('main-page');
-    const loginForm = document.getElementById('login-form');
+    // Adicionar evento de clique aos botões de idioma
+    document.querySelectorAll('#language-buttons .language-button').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('#language-buttons .language-button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        });
+    });
 
-    // Armazenar a escolha do usuário
-    yesButton.addEventListener('click', function() {
-        localStorage.setItem('ageGroup', 'adult');
+    // Variáveis para elementos da verificação de idade
+    const ageVerification = document.getElementById('age-verification');
+    const rectanglesContainer = document.getElementById('rectangles-container');
+    const mainPage = document.getElementById('main-page');
+    const yesButton = document.getElementById('verify-age-yes');
+    const noButton = document.getElementById('verify-age-no');
+
+    // Exibir a tela de verificação de idade
+    ageVerification.style.display = 'flex';
+
+    // Adicionar evento de clique ao botão "Sim" para esconder a tela de verificação e mostrar os retângulos
+    yesButton.addEventListener('click', () => {
         ageVerification.style.display = 'none';
+        rectanglesContainer.style.display = 'flex';
         mainPage.classList.add('show');
     });
 
-    noButton.addEventListener('click', function() {
-        localStorage.setItem('ageGroup', 'minor');
-        window.location.href = "https://www.google.com"; // Redireciona para uma outra página
+    // Adicionar evento de clique ao botão "Não" para sair da página
+    noButton.addEventListener('click', () => {
+        window.location.href = 'https://www.google.com'; // Redirecionar para outro site ou página de saída
     });
 
-    // Lógica de Login
-    loginForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Impede o envio do formulário
+    // Adicionar evento de envio ao formulário de login
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault(); // Prevenir o envio padrão do formulário
+        const username = document.getElementById('username').value;
+        const category = document.getElementById('category').value;
 
-        const category = document.getElementById('category').value.trim();
-        const ageGroup = localStorage.getItem('ageGroup'); // Recupera a escolha do usuário
+        if (!username) {
+            alert('Por favor, insira um nome de usuário.');
+            return; // Interrompe a execução se o nome de usuário não for fornecido
+        }
 
-        // Redireciona para chat.html com parâmetros de categoria e idade
-        window.location.href = `chat.html?category=${encodeURIComponent(category)}&ageGroup=${encodeURIComponent(ageGroup)}`;
+        // Redirecionar para chat.html com os parâmetros de usuário e categoria
+        window.location.href = `chat.html?username=${encodeURIComponent(username)}&category=${encodeURIComponent(category)}`;
     });
 });
-
-
-const ws = new WebSocket('ws://localhost:8080');
-
-ws.onopen = () => {
-    console.log('Conectado ao servidor WebSocket');
-};
-
-ws.onmessage = (event) => {
-    console.log('Mensagem recebida: ', event.data);
-};
-
-ws.onclose = () => {
-    console.log('Desconectado do servidor WebSocket');
-};
-
-// Enviar mensagem ao servidor
-function sendMessage(message) {
-    ws.send(message);
-}

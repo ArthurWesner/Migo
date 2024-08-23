@@ -1,19 +1,31 @@
 const WebSocket = require('ws');
+const server = new WebSocket.Server({ port: 8080 });
 
-const wss = new WebSocket.Server({ port: 8080 });
+const clients = new Map();
 
-wss.on('connection', ws => {
-    ws.on('message', message => {
-        // Encaminha a mensagem para todos os clientes conectados
-        wss.clients.forEach(client => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
-        });
+server.on('connection', (ws) => {
+    ws.on('message', (message) => {
+        const data = JSON.parse(message);
+
+        if (data.type === 'login') {
+            clients.set(ws, data.category);
+            ws.send(JSON.stringify({ type: 'welcome', text: 'Bem-vindo ao chat!' }));
+        } else if (data.type === 'message') {
+            // Envia mensagem para todos os clientes
+            clients.forEach((_, client) => {
+                if (client !== ws) {
+                    client.send(JSON.stringify({ type: 'message', text: data.text }));
+                }
+            });
+        } else if (data.type === 'skip') {
+            // Lógica para pular para o próximo usuário
+        } else if (data.type === 'report') {
+            // Lógica para denunciar o usuário
+        }
     });
 
     ws.on('close', () => {
-        console.log('Cliente desconectado');
+        clients.delete(ws);
     });
 });
 
